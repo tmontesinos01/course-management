@@ -17,6 +17,11 @@ class InscripcionRepository extends Repository implements InscripcionRepositoryI
         return $this->model->with(['curso', 'participante'])->get();
     }
 
+    public function paginate(int $perPage = 15)
+    {
+        return $this->model->with(['curso', 'participante'])->paginate($perPage);
+    }
+
     public function find($id)
     {
         return $this->model->with(['curso', 'participante'])->find($id);

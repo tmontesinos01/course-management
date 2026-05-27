@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoCurso;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Curso extends Model
 {
+    use SoftDeletes;
     protected $table = 'cursos';
     protected $fillable = [
         'nombre',
@@ -25,6 +28,12 @@ class Curso extends Model
         'fecha_hasta' => 'date',
         'fecha_log' => 'datetime',
         'fecha_alta' => 'datetime',
-        'importe' => 'decimal:2'
+        'importe' => 'decimal:2',
+        'estado' => EstadoCurso::class
     ];
+
+    public function inscripciones()
+    {
+        return $this->hasMany(Inscripcion::class, 'id_curso');
+    }
 }

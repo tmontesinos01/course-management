@@ -17,6 +17,11 @@ abstract class Repository implements RepositoryInterface
         return $this->model->all();
     }
 
+    public function paginate(int $perPage = 15)
+    {
+        return $this->model->paginate($perPage);
+    }
+
     public function find($id)
     {
         return $this->model->find($id);
@@ -46,4 +51,3 @@ abstract class Repository implements RepositoryInterface
         return false;
     }
 }
-?>
