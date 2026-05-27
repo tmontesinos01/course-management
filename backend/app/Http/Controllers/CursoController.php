@@ -41,8 +41,7 @@ class CursoController extends Controller
 
     public function update(CursoRequest $request, $id): JsonResponse
     {
-        $curso = \App\Models\Curso::findOrFail($id);
-        $curso->update($request->validated());
+        $curso = $this->service->update($id, $request->validated());
         return $this->success(new CursoResource($curso), 'Curso actualizado exitosamente');
     }
 

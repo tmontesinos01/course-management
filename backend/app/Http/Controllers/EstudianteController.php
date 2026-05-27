@@ -41,8 +41,7 @@ class EstudianteController extends Controller
 
     public function update(EstudianteRequest $request, $id): JsonResponse
     {
-        $estudiante = \App\Models\Estudiante::findOrFail($id);
-        $estudiante->update($request->validated());
+        $estudiante = $this->service->update($id, $request->validated());
         return $this->success(new EstudianteResource($estudiante), 'Estudiante actualizado exitosamente');
     }
 

@@ -41,8 +41,7 @@ class MedioPagoController extends Controller
 
     public function update(MedioPagoRequest $request, $id): JsonResponse
     {
-        $medioPago = \App\Models\MedioPago::findOrFail($id);
-        $medioPago->update($request->validated());
+        $medioPago = $this->service->update($id, $request->validated());
         return $this->success(new MedioPagoResource($medioPago), 'Medio de pago actualizado exitosamente');
     }
 

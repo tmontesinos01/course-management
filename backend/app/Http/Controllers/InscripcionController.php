@@ -41,8 +41,7 @@ class InscripcionController extends Controller
 
     public function update(InscripcionRequest $request, $id): JsonResponse
     {
-        $inscripcion = \App\Models\Inscripcion::findOrFail($id);
-        $inscripcion->update($request->validated());
+        $inscripcion = $this->service->update($id, $request->validated());
         return $this->success(new InscripcionResource($inscripcion), 'Inscripcion actualizada exitosamente');
     }
 
