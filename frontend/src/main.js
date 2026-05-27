@@ -1,60 +1,103 @@
-import './style.css'
-import javascriptLogo from './assets/javascript.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import { setupCounter } from './counter.js'
+import './index.css';
 
-document.querySelector('#app').innerHTML = `
-<section id="center">
-  <div class="hero">
-    <img src="${heroImg}" class="base" width="170" height="179">
-    <img src="${javascriptLogo}" class="framework" alt="JavaScript logo"/>
-    <img src="${viteLogo}" class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/main.js</code> and save to test <code>HMR</code></p>
-  </div>
-  <button id="counter" type="button" class="counter"></button>
-</section>
+import { DashboardPage } from './pages/DashboardPage.js';
+import { CursosPage } from './pages/CursosPage.js';
+import { EstudiantesPage } from './pages/EstudiantesPage.js';
+import { InscripcionesPage } from './pages/InscripcionesPage.js';
+import { MediosPagoPage } from './pages/MediosPagoPage.js';
+import { InscripcionCursoPage } from './pages/InscripcionCursoPage.js';
+import { CursosLandingPage } from './pages/CursosLandingPage.js';
+import { Sidebar } from './components/Sidebar.js';
+import { icon } from './components/Icons.js';
 
-<div class="ticks"></div>
+class App {
+  constructor() {
+    this.container = document.getElementById('app');
+    this.currentPage = null;
+    this.currentRoute = 'dashboard';
+    this.routes = {
+      'dashboard': DashboardPage,
+      'cursos': CursosPage,
+      'estudiantes': EstudiantesPage,
+      'inscripciones': InscripcionesPage,
+      'medios-pago': MediosPagoPage,
+      'inscripcion-curso': InscripcionCursoPage,
+      'cursos-publico': CursosLandingPage,
+    };
+  }
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#documentation-icon"></use></svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank">
-          <img class="logo" src="${viteLogo}" alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-          <img class="button-icon" src="${javascriptLogo}" alt="">
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#social-icon"></use></svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li><a href="https://github.com/vitejs/vite" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#github-icon"></use></svg>GitHub</a></li>
-      <li><a href="https://chat.vite.dev/" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#discord-icon"></use></svg>Discord</a></li>
-      <li><a href="https://x.com/vite_js" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#x-icon"></use></svg>X.com</a></li>
-      <li><a href="https://bsky.app/profile/vite.dev" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#bluesky-icon"></use></svg>Bluesky</a></li>
-    </ul>
-  </div>
-</section>
+  init() {
+    this.renderLayout();
+    this.setupNavigation();
+    
+    // Check initial hash
+    const initialRoute = window.location.hash.slice(1) || 'dashboard';
+    this.navigate(initialRoute);
+  }
 
-<div class="ticks"></div>
-<section id="spacer"></section>
-`
+  renderLayout() {
+    this.container.innerHTML = `
+      <div class="flex min-h-screen">
+        <div id="sidebar-container"></div>
+        <main class="flex-1 ml-64 p-6" id="main-content"></main>
+      </div>
+    `;
+    
+    this.renderSidebar();
+  }
 
-setupCounter(document.querySelector('#counter'))
+  renderSidebar() {
+    const sidebarContainer = this.container.querySelector('#sidebar-container');
+    sidebarContainer.innerHTML = Sidebar({ activeRoute: this.currentRoute });
+  }
+
+  setupNavigation() {
+    const sidebar = this.container.querySelector('#sidebar-container');
+    
+    sidebar.addEventListener('click', (e) => {
+      const link = e.target.closest('a[data-route]');
+      if (!link) return;
+
+      e.preventDefault();
+      const route = link.dataset.route;
+      this.navigate(route);
+    });
+
+    window.addEventListener('hashchange', () => {
+      const route = window.location.hash.slice(1) || 'dashboard';
+      this.navigate(route);
+    });
+  }
+
+  navigate(route) {
+    const mainContent = this.container.querySelector('#main-content');
+    const PageClass = this.routes[route];
+    
+    if (!PageClass) {
+      this.navigate('dashboard');
+      return;
+    }
+
+    this.currentRoute = route;
+    this.renderSidebar();
+    
+    this.currentPage = new PageClass(mainContent);
+    this.currentPage.render();
+    window.location.hash = route;
+    
+    // Update document title
+    const titles = {
+      'dashboard': 'Dashboard - Course Manager',
+      'cursos': 'Cursos - Course Manager',
+      'estudiantes': 'Estudiantes - Course Manager',
+      'inscripciones': 'Inscripciones - Course Manager',
+      'medios-pago': 'Medios de Pago - Course Manager',
+      'inscripcion-curso': 'Inscribir a Curso - Course Manager',
+      'cursos-publico': 'Cursos - Course Manager',
+    };
+    document.title = titles[route] || 'Course Manager';
+  }
+}
+
+const app = new App();
+app.init();
