@@ -24,7 +24,7 @@ class InscripcionController extends Controller
     {
         $perPage = $request->integer('per_page', 15);
         $inscripciones = $this->service->paginate($perPage);
-        return $this->success(InscripcionResource::collection($inscripciones)->response()->getData(true));
+        return $this->paginated(InscripcionResource::collection($inscripciones));
     }
 
     public function store(InscripcionRequest $request): JsonResponse
@@ -35,28 +35,21 @@ class InscripcionController extends Controller
 
     public function show($id): JsonResponse
     {
-        $inscripcion = $this->service->getById($id);
-        if (!$inscripcion) {
-            return $this->error('Inscripcion no encontrada', 404);
-        }
+        $inscripcion = \App\Models\Inscripcion::with(['curso', 'participante'])->findOrFail($id);
         return $this->success(new InscripcionResource($inscripcion));
     }
 
     public function update(InscripcionRequest $request, $id): JsonResponse
     {
-        $inscripcion = $this->service->update($id, $request->validated());
-        if (!$inscripcion) {
-            return $this->error('Inscripcion no encontrada', 404);
-        }
+        $inscripcion = \App\Models\Inscripcion::findOrFail($id);
+        $inscripcion->update($request->validated());
         return $this->success(new InscripcionResource($inscripcion), 'Inscripcion actualizada exitosamente');
     }
 
     public function destroy($id): JsonResponse
     {
-        $deleted = $this->service->delete($id);
-        if (!$deleted) {
-            return $this->error('Inscripcion no encontrada', 404);
-        }
+        $inscripcion = \App\Models\Inscripcion::findOrFail($id);
+        $inscripcion->delete();
         return $this->noContent('Inscripcion eliminada exitosamente');
     }
 }

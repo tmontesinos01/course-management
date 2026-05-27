@@ -15,6 +15,18 @@ trait ApiResponse
         ], $status);
     }
 
+    protected function paginated($resource, string $message = 'OK'): JsonResponse
+    {
+        $paginated = $resource->response()->getData(true);
+        return response()->json([
+            'status' => 200,
+            'message' => $message,
+            'data' => $paginated['data'],
+            'meta' => $paginated['meta'] ?? null,
+            'links' => $paginated['links'] ?? null,
+        ], 200);
+    }
+
     protected function created($data = null, string $message = 'Recurso creado exitosamente'): JsonResponse
     {
         return $this->success($data, $message, 201);

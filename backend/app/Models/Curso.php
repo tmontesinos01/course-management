@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Enums\EstadoCurso;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Curso extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
     protected $table = 'cursos';
     protected $fillable = [
         'nombre',

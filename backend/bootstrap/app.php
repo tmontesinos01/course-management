@@ -24,21 +24,15 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*'),
         );
 
-        $exceptions->renderable(function (ModelNotFoundException $e, Request $request) {
-            if ($request->is('api/*')) {
-                return response()->json([
-                    'status' => 404,
-                    'message' => 'Recurso no encontrado',
-                    'errors' => null,
-                ], 404);
-            }
-        });
-
         $exceptions->renderable(function (NotFoundHttpException $e, Request $request) {
             if ($request->is('api/*')) {
+                $message = $e->getPrevious() instanceof ModelNotFoundException
+                    ? 'Recurso no encontrado'
+                    : 'Ruta no encontrada';
+
                 return response()->json([
                     'status' => 404,
-                    'message' => 'Ruta no encontrada',
+                    'message' => $message,
                     'errors' => null,
                 ], 404);
             }

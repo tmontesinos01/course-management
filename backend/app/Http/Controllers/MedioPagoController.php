@@ -24,7 +24,7 @@ class MedioPagoController extends Controller
     {
         $perPage = $request->integer('per_page', 15);
         $mediosPagos = $this->service->paginate($perPage);
-        return $this->success(MedioPagoResource::collection($mediosPagos)->response()->getData(true));
+        return $this->paginated(MedioPagoResource::collection($mediosPagos));
     }
 
     public function store(MedioPagoRequest $request): JsonResponse
@@ -35,28 +35,21 @@ class MedioPagoController extends Controller
 
     public function show($id): JsonResponse
     {
-        $medioPago = $this->service->getById($id);
-        if (!$medioPago) {
-            return $this->error('Medio de pago no encontrado', 404);
-        }
+        $medioPago = \App\Models\MedioPago::findOrFail($id);
         return $this->success(new MedioPagoResource($medioPago));
     }
 
     public function update(MedioPagoRequest $request, $id): JsonResponse
     {
-        $medioPago = $this->service->update($id, $request->validated());
-        if (!$medioPago) {
-            return $this->error('Medio de pago no encontrado', 404);
-        }
+        $medioPago = \App\Models\MedioPago::findOrFail($id);
+        $medioPago->update($request->validated());
         return $this->success(new MedioPagoResource($medioPago), 'Medio de pago actualizado exitosamente');
     }
 
     public function destroy($id): JsonResponse
     {
-        $deleted = $this->service->delete($id);
-        if (!$deleted) {
-            return $this->error('Medio de pago no encontrado', 404);
-        }
+        $medioPago = \App\Models\MedioPago::findOrFail($id);
+        $medioPago->delete();
         return $this->noContent('Medio de pago eliminado exitosamente');
     }
 }

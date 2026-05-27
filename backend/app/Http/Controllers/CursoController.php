@@ -24,7 +24,7 @@ class CursoController extends Controller
     {
         $perPage = $request->integer('per_page', 15);
         $cursos = $this->service->paginate($perPage);
-        return $this->success(CursoResource::collection($cursos)->response()->getData(true));
+        return $this->paginated(CursoResource::collection($cursos));
     }
 
     public function store(CursoRequest $request): JsonResponse
@@ -35,28 +35,21 @@ class CursoController extends Controller
 
     public function show($id): JsonResponse
     {
-        $curso = $this->service->getById($id);
-        if (!$curso) {
-            return $this->error('Curso no encontrado', 404);
-        }
+        $curso = \App\Models\Curso::findOrFail($id);
         return $this->success(new CursoResource($curso));
     }
 
     public function update(CursoRequest $request, $id): JsonResponse
     {
-        $curso = $this->service->update($id, $request->validated());
-        if (!$curso) {
-            return $this->error('Curso no encontrado', 404);
-        }
+        $curso = \App\Models\Curso::findOrFail($id);
+        $curso->update($request->validated());
         return $this->success(new CursoResource($curso), 'Curso actualizado exitosamente');
     }
 
     public function destroy($id): JsonResponse
     {
-        $deleted = $this->service->delete($id);
-        if (!$deleted) {
-            return $this->error('Curso no encontrado', 404);
-        }
+        $curso = \App\Models\Curso::findOrFail($id);
+        $curso->delete();
         return $this->noContent('Curso eliminado exitosamente');
     }
 }

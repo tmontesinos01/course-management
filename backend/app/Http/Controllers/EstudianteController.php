@@ -24,7 +24,7 @@ class EstudianteController extends Controller
     {
         $perPage = $request->integer('per_page', 15);
         $estudiantes = $this->service->paginate($perPage);
-        return $this->success(EstudianteResource::collection($estudiantes)->response()->getData(true));
+        return $this->paginated(EstudianteResource::collection($estudiantes));
     }
 
     public function store(EstudianteRequest $request): JsonResponse
@@ -35,28 +35,21 @@ class EstudianteController extends Controller
 
     public function show($id): JsonResponse
     {
-        $estudiante = $this->service->getById($id);
-        if (!$estudiante) {
-            return $this->error('Estudiante no encontrado', 404);
-        }
+        $estudiante = \App\Models\Estudiante::findOrFail($id);
         return $this->success(new EstudianteResource($estudiante));
     }
 
     public function update(EstudianteRequest $request, $id): JsonResponse
     {
-        $estudiante = $this->service->update($id, $request->validated());
-        if (!$estudiante) {
-            return $this->error('Estudiante no encontrado', 404);
-        }
+        $estudiante = \App\Models\Estudiante::findOrFail($id);
+        $estudiante->update($request->validated());
         return $this->success(new EstudianteResource($estudiante), 'Estudiante actualizado exitosamente');
     }
 
     public function destroy($id): JsonResponse
     {
-        $deleted = $this->service->delete($id);
-        if (!$deleted) {
-            return $this->error('Estudiante no encontrado', 404);
-        }
+        $estudiante = \App\Models\Estudiante::findOrFail($id);
+        $estudiante->delete();
         return $this->noContent('Estudiante eliminado exitosamente');
     }
 }
